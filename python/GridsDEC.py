@@ -9,6 +9,8 @@ from __future__ import division
 import numpy as np
 import scipy as sp
 
+from utils import mod
+
 class GridDEC(object):
     """
     TorusDEC a class simple 3D grid with basic exterior calculus operations.
@@ -108,6 +110,44 @@ class GridDEC(object):
         self.px = (self.iix)*self.dx
         self.py = (self.iiy)*self.dy
         self.pz = (self.iiz)*self.dz
+        
+    def DerivativeOfFunction(self, f):
+        """
+        for the function f, compute the 1-form df
+        
+        f is a 3D array representing a scalar function on the grid.
+        
+        vx,vy,vz is the 1-form df integrated along edges. 
+        
+        vx corresonds to edge (i,j,k)->(i+1,j,k) and so on.
+        """
+    	ixp = mod(self.ix+1,self.resx)
+    	iyp = mod(self.iy+1,self.resy)
+    	izp = mod(self.iz+1,self.resz)
+        vx = f[ixp,:,:] - f
+        vy = f[:,iyp,:] - f
+        vz = f[:,:,izp] - f
+        return np.asarray([vx,vy,vz])
+        
+    def DerivativeOfOneForm(self, vx,vy,vz):
+        """
+        For a 1-form v compute the 2-form dv
+        
+        f is a 3D array representing a scalar function on the grid.
+        
+        vx,vy,vz is the 1-form df integrated along edges. 
+        
+        vx corresonds to edge (i,j,k)->(i+1,j,k) and so on.
+        """
+        ixp = mod(self.ix+1,self.resx)
+        iyp = mod(self.iy+1,self.resy)
+        izp = mod(self.iz+1,self.resz)
+        wx = vy - vy(:,:,izp) + vz(:,iyp,:) - vz
+        wy = vz - vz(ixp,:,:) + vx(:,:,izp) - vx
+        wz = vx - vx(:,iyp,:) + vy(ixp,:,:) - vy
+        return np.asarray([vx,vy,vz])
+        
+        
         
 if __name__ == '__main__':
     sizex = 10
