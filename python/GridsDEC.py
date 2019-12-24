@@ -142,10 +142,10 @@ class GridDEC(object):
         ixp = mod(self.ix+1,self.resx)
         iyp = mod(self.iy+1,self.resy)
         izp = mod(self.iz+1,self.resz)
-        wx = vy - vy(:,:,izp) + vz(:,iyp,:) - vz
-        wy = vz - vz(ixp,:,:) + vx(:,:,izp) - vx
-        wz = vx - vx(:,iyp,:) + vy(ixp,:,:) - vy
-        return np.asarray([vx,vy,vz])
+        wx = vy - vy[:,:,izp] + vz[:,iyp,:] - vz
+        wy = vz - vz[ixp,:,:] + vx[:,:,izp] - vx
+        wz = vx - vx[:,iyp,:] + vy[ixp,:,:] - vy
+        return np.asarray([wx,wy,wz])
         
         
         
