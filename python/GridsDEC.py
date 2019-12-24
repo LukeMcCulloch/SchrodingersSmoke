@@ -104,6 +104,16 @@ class GridDEC(object):
                                                  self.iy,
                                                  self.iz)
         
-        self.px = (self.iix-1)*self.dx
-        self.py = (self.iiy-1)*self.dy
-        self.pz = (self.iiz-1)*self.dz
+        self.px = (self.iix)*self.dx
+        self.py = (self.iiy)*self.dy
+        self.pz = (self.iiz)*self.dz
+        
+if __name__ == '__main__':
+    sizex = 10
+    sizey = 10
+    sizez = 10
+    res = 10
+    self = GridDEC(sizex=sizex,
+                   sizey=sizey,
+                   sizez=sizez,
+                   res=res)
