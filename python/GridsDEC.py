@@ -7,7 +7,14 @@ Created on Tue Dec 24 05:18:31 2019
 """
 from __future__ import division
 import numpy as np
-import scipy as sp
+#import scipy as sp
+fft = np.fft.fft
+ifft = np.fft.ifft
+fftn = np.fft.fftn
+ifftn = np.fft.ifftn
+
+sin = np.sin
+pi = np.pi
 
 from utils import mod
 
@@ -129,6 +136,7 @@ class GridDEC(object):
         vz = f[:,:,izp] - f
         return np.asarray([vx,vy,vz])
         
+    
     def DerivativeOfOneForm(self, vx,vy,vz):
         """
         For a 1-form v compute the 2-form dv
@@ -146,6 +154,74 @@ class GridDEC(object):
         wy = vz - vz[ixp,:,:] + vx[:,:,izp] - vx
         wz = vx - vx[:,iyp,:] + vy[ixp,:,:] - vy
         return np.asarray([wx,wy,wz])
+    
+    
+    def DerivativeOfTwoForm(self,wx,wy,wz):
+        """
+        #DerivativeOfTwoForm
+        #For a 2-form w compute the 3-form dw
+        """
+        ixp = mod(self.ix + 1,self.resx)
+        iyp = mod(self.iy + 1,self.resy)
+        izp = mod(self.iz + 1,self.resz)
+        f =     wx[ixp,:,:] - wx
+        f = f + wy[:,iyp,:] - wy
+        f = f + wz[:,:,izp] - wz
+        return f
+        
+    def Div(self,vx,vy,vz):
+        """
+        #Div
+        #For a 1-form v compute the def *d*v
+        """
+        ixm = mod(self.ix-2 + 1,self.resx)
+        iym = mod(self.iy-2 + 1,self.resy)
+        izm = mod(self.iz-2 + 1,self.resz)
+        f =     [vx - vx[ixm,:,:]]/(self.dx**2)
+        f = f + [vy - vy[:,iym,:]]/(self.dy**2)
+        f = f + [vz - vz[:,:,izm]]/(self.dz**2)
+        return f
+        
+    def Sharp(self,vx,vy,vz):
+        """
+        #Sharp
+        #For a 1-form v compute the corresponding vector field v^sharp by
+        #averaging to vertices
+        """
+        ixm = mod(self.ix-2 + 1,self.resx)
+        iym = mod(self.iy-2 + 1,self.resy)
+        izm = mod(self.iz-2 + 1,self.resz)
+        ux = 0.5*( vx[ixm,:,:] + vx )/self.dx
+        uy = 0.5*( vy[:,iym,:] + vy )/self.dy
+        uz = 0.5*( vz[:,:,izm] + vz )/self.dz
+        return  np.asarray([ux,uy,uz])
+        
+    def StaggeredSharp(self,vx,vy,vz):
+        """
+        #StaggeredSharp
+        #For a 1-form v compute the corresponding vector field v^sharp as
+        #a staggered vector field living on edges
+        """
+        ux = vx/self.dx
+        uy = vy/self.dy
+        uz = vz/self.dz
+        return  np.asarray([ux,uy,uz])
+        
+    def PoissonSolve(self,f):
+        """
+        #PoissonSolve by Spectral method
+        """
+        f = fftn(f)
+        sx = sin(pi*(self.iix-1)/self.resx)/self.dx
+        sy = sin(pi*(self.iiy-1)/self.resy)/self.dy
+        sz = sin(pi*(self.iiz-1)/self.resz)/self.dz
+        denom = sx**2 + sy**2 + sz**2
+        fac = -0.25/denom
+        fac[0,0,0] = 0
+        f = f * fac
+        #f = np.multiply(f,fac)
+        f = ifftn(f)
+        return f
         
         
         
