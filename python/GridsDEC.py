@@ -74,6 +74,19 @@ class GridDEC(object):
         the 3-torus (negative semidefinite convension).  
         u and f has zero mean.
     """
-    def __init__(self):
+    def __init__(self,
+                 sizex, sizey, sizez, # size of grid
+                 resx=None, resy=None, resz=None, res=None):   # number of grid points in each dimension)
+        self.sizex = sizex
+        self.sizey = sizey
+        self.sizez = sizez
+        if res is not None:
+            self.resx = res
+            self.resy = res
+            self.resz = res
+        else:
+            self.resx = resx
+            self.resy = resy
+            self.resz = resz
         pass
     
