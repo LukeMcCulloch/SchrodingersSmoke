@@ -5,7 +5,9 @@ Created on Tue Dec 24 05:18:31 2019
 
 @author: lukemcculloch
 """
-
+from __future__ import division
+import numpy as np
+import scipy as sp
 
 class GridDEC(object):
     """
@@ -88,5 +90,20 @@ class GridDEC(object):
             self.resx = resx
             self.resy = resy
             self.resz = resz
-        pass
-    
+        
+        self.dx = self.sizex/self.resx #using python 3 division!
+        self.dy = self.sizey/self.resy
+        self.dz = self.sizez/self.resz
+        
+        self.ix = np.arange(0,self.resx)
+        self.iy = np.arange(0,self.resy)
+        self.iz = np.arange(0,self.resz)
+        
+        #[self.iix,self.iiy,self.iiz] = ndgrid(self.ix,self.iy,self.iz)
+        self.iix,self.iiy,self.iiz = np.meshgrid(self.ix,
+                                                 self.iy,
+                                                 self.iz)
+        
+        self.px = (self.iix-1)*self.dx
+        self.py = (self.iiy-1)*self.dy
+        self.pz = (self.iiz-1)*self.dz
