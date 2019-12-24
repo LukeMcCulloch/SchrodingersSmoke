@@ -99,7 +99,8 @@ class GridDEC(object):
         self.iy = np.arange(0,self.resy)
         self.iz = np.arange(0,self.resz)
         
-        #[self.iix,self.iiy,self.iiz] = ndgrid(self.ix,self.iy,self.iz)
+        # numpy y coord == matlab z coord
+        # numpy z coord == matlab y coord
         self.iix,self.iiy,self.iiz = np.meshgrid(self.ix,
                                                  self.iy,
                                                  self.iz)
