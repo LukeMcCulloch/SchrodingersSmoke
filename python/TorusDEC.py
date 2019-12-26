@@ -19,7 +19,7 @@ pi = np.pi
 
 from utils import mod
 
-class GridDEC(object):
+class TorusDEC(object):
     """
     TorusDEC a class simple 3D grid with basic exterior calculus operations.
 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     sizey = 10
     sizez = 10
     res = 10
-    self = GridDEC(sizex=sizex,
+    self = TorusDEC(sizex=sizex,
                    sizey=sizey,
                    sizez=sizez,
                    res=res)

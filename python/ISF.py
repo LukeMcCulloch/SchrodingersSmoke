@@ -34,5 +34,12 @@ class ISF(TorusDEC):
             See also TorusDEC
     """
     
-    def __init__(self):
-        pass
+    def __init__(self, sizex, sizey, sizez,
+                 resx=None, resy=None, resz=None, res=None,
+                 hbar=None, dt=None, 
+                 SchroedingerMask=None):
+        super().__init__(sizex, sizey, sizez,
+                         resx, resy, resz, res)
+        self.hbar = hbar             # reduced Planck constant
+        self.dt   = dt             # time step
+        self.SchroedingerMask = SchroedingerMask# Fourier coefficient for solving Schroedinger eq
