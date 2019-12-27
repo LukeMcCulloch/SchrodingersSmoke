@@ -13,7 +13,7 @@ fft = np.fft.fft
 ifft = np.fft.ifft
 fftn = np.fft.fftn
 ifftn = np.fft.ifftn
-fftshift = bp.fft.fftshift
+fftshift = np.fft.fftshift
 
 sin = np.sin
 pi = np.pi
@@ -81,8 +81,8 @@ class ISF(TorusDEC):
         # solves Schroedinger equation for dt time.
         #
         psi1 = fftshift(fftn(psi1)); psi2 = fftshift(fftn(psi2))
-        psi1 = psi1.multiply( self.SchroedingerMask )
-        psi2 = psi2.multiply( self.SchroedingerMask )
+        psi1 = np.multiply( psi1 , self.SchroedingerMask )
+        psi2 = np.multiply( psi2 , self.SchroedingerMask )
         psi1 = ifftn(fftshift(psi1)); psi2 = ifftn(fftshift(psi2))
         return np.asarray([psi1,psi2])
         
@@ -102,12 +102,12 @@ class ISF(TorusDEC):
         ixp = mod(self.ix,self.resx) + 1.
         iyp = mod(self.iy,self.resy) + 1.
         izp = mod(self.iz,self.resz) + 1.
-        vx = angle(conj(psi1).multiply( psi1[ixp,:,:]  )
-                  +conj(psi2).multiply( psi2[ixp,:,:]) )
-        vy = angle(conj(psi1).multiply( psi1[:,iyp,:]  )
-                  +conj(psi2).multiply( psi2[:,iyp,:]) )
-        vz = angle(conj(psi1).multiply( psi1[:,:,izp]  )
-                  +conj(psi2).multiply( psi2[:,:,izp]) )
+        vx = angle(conj(psi1) * psi1[ixp,:,:]  
+                  +conj(psi2) * psi2[ixp,:,:] )
+        vy = angle(conj(psi1) * psi1[:,iyp,:]
+                  +conj(psi2) * psi2[:,iyp,:] )
+        vz = angle(conj(psi1) * psi1[:,:,izp]
+                  +conj(psi2) * psi2[:,:,izp] )
         if nargin<4:
             hbar = 1
             
@@ -126,14 +126,15 @@ class ISF(TorusDEC):
         rz = self.pz - center[2]
         #normal = normal/norm(normal,2) #matlab calls for the 2 norm
         normal = normal/np.linalg.norm(normal) #linalg gives the 2-norm by default
-        alpha = np.zeros(size(rx))
+        alpha = np.zeros_like(rx)
         z = rx*normal[0] + ry*normal[1] + rz*normal[2]
         inCylinder = (rx**2+ry**2+rz**2 - z**2) < r**2
-        inLayerP = z> 0 & z<= d/2 & inCylinder
-        inLayerM = z<=0 & z>=-d/2 & inCylinder
-        alpha[inLayerP] = -pi*(2*z(inLayerP)/d - 1)
-        alpha[inLayerM] = -pi*(2*z(inLayerM)/d + 1)
-        psi = psi.multiply( exp(1i*alpha) )
+        inLayerP = (z> 0) & (z<= d/2) & inCylinder
+        inLayerM = (z<=0) & (z>=-d/2) & inCylinder
+        alpha[inLayerP] = -pi*(2*z(inLayerP)/d - 1.)
+        alpha[inLayerM] = -pi*(2*z(inLayerM)/d + 1.)
+        #psi = np.multiply( psi , exp(1j*alpha) )
+        psi = psi * exp(1j*alpha)
         return psi
 
 
@@ -141,31 +142,33 @@ class ISF(TorusDEC):
     def GaugeTransform(psi1,psi2,q) :
         # multiplies exp(i*q) to (psi1,psi2)
         #
-        eiq = exp(1i*q)
-        psi1 = psi1.multiply( eiq )
-        psi2 = psi2.multiply( eiq )
+        eiq = exp(1j*q)
+        psi1 = np.multiply( psi1 , eiq )
+        psi2 = np.multiply( psi2 , eiq )
         return np.asarray([psi1,psi2])
     
     
     @staticmethod
-    def [sx,sy,sz] = Hopf(psi1,psi2) :
+    def Hopf(psi1,psi2) :
         # extracts Clebsch variable s=(sx,sy,sz) from (psi1,psi2)
         #
-        a = real(psi1)
-        b = imag(psi1)
-        c = real(psi2)
-        d = imag(psi2)
-        sx = 2*( a.multiply( c ) + b.multiply( d ) )
-        sy = 2*( a.multiply( d ) - b.multiply( c ) )
+        a = np.real(psi1)
+        b = np.imag(psi1)
+        c = np.real(psi2)
+        d = np.imag(psi2)
+        #sx = 2*( a.multiply( c ) + b.multiply( d ) )
+        #sy = 2*( a.multiply( d ) - b.multiply( c ) )
+        sx = 2*( a*c + b*d )
+        sy = 2*( a*d - b*c )
         sz = a**2 + b**2 - c**2 - d**2
-        return
+        return np.asarray([sx,sy,sz])
     
     
     @staticmethod
-    def [psi1,psi2] = Normalize(psi1,psi2) :
+    def Normalize(psi1,psi2) :
         # normalizes (psi1,psi2).
         #
-        psi_norm = sqrt(abs(psi1)**2 + abs(psi2)**2)
-        psi1 = psi1./psi_norm
-        psi2 = psi2./psi_norm
-        return
+        psi_norm = np.sqrt(abs(psi1)**2 + abs(psi2)**2)
+        psi1 = psi1/psi_norm
+        psi2 = psi2/psi_norm
+        return np.asarray([psi1,psi2])
