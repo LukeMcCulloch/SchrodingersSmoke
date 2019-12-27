@@ -1,8 +1,16 @@
 
 
 import numpy as np
+fft = np.fft.fft
+ifft = np.fft.ifft
+fftn = np.fft.fftn
+ifftn = np.fft.ifftn
+
+sin = np.sin
+pi = np.pi
 
 from TorusDEC import TorusDEC
+
 
 
 class ISF(TorusDEC):
@@ -53,8 +61,11 @@ class ISF(TorusDEC):
         kx = (self.iix-1-nx/2)/(self.sizex)
         ky = (self.iiy-1-ny/2)/(self.sizey)
         kz = (self.iiz-1-nz/2)/(self.sizez)
-        lambda = fac*(kx.^2+ky.^2+kz.^2)
-        self.SchroedingerMask = exp(1i*lambda*self.dt/2)
+        #lambda = fac*(kx.^2+ky.^2+kz.^2)
+        def myfunc():
+            return fac*(kx**2+ky**2+kz**2)
+        
+        self.SchroedingerMask = exp(1i*lambda()*self.dt/2)
         return
         
     def [psi1,psi2] = SchroedingerFlow(self,psi1,psi2)
