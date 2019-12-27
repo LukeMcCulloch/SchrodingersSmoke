@@ -70,22 +70,22 @@ class ISF(TorusDEC):
         kx = (self.iix-1-nx/2)/(self.sizex)
         ky = (self.iiy-1-ny/2)/(self.sizey)
         kz = (self.iiz-1-nz/2)/(self.sizez)
-        #lambda = fac*(kx.^2+ky.^2+kz.^2)
+        #lambda = fac*(kx**2+ky**2+kz**2)
         avar = fac*(kx**2+ky**2+kz**2)
         
         self.SchroedingerMask = exp(1.j*avar*self.dt/2.)
         return
         
-    def [psi1,psi2] = SchroedingerFlow(self,psi1,psi2)
+    def SchroedingerFlow(self,psi1,psi2) :
         # solves Schroedinger equation for dt time.
         #
         psi1 = fftshift(fftn(psi1)) psi2 = fftshift(fftn(psi2))
         psi1 = psi1.*self.SchroedingerMask
         psi2 = psi2.*self.SchroedingerMask
         psi1 = ifftn(fftshift(psi1)) psi2 = ifftn(fftshift(psi2))
-        return
+        return np.asarray([psi1,psi2])
         
-    def [psi1,psi2] = PressureProject(self,psi1,psi2)
+    def [psi1,psi2] = PressureProject(self,psi1,psi2) :
         # Pressure projection of 2-component wave def.
         #
         [vx,vy,vz] = self.VelocityOneForm(psi1,psi2)
@@ -94,7 +94,7 @@ class ISF(TorusDEC):
         [psi1,psi2] = self.GaugeTransform(psi1,psi2,-q)
         return
         
-    def [vx,vy,vz] = VelocityOneForm(self,psi1,psi2,hbar)
+    def [vx,vy,vz] = VelocityOneForm(self,psi1,psi2,hbar) :
         # extracts velocity 1-form from (psi1,psi2).
         # If hbar argument is empty, hbar=1 is assumed.
         ixp = mod(self.ix,self.resx) + 1
@@ -114,7 +114,7 @@ class ISF(TorusDEC):
         vz = vz*hbar
         return
     
-    def psi = AddCircle(self,psi,center,normal,r,d)
+    def psi = AddCircle(self,psi,center,normal,r,d) :
         # adds a vortex ring to a 1-component wave def psi.
         # Inputs center, normal, r specify the circle.
         # Input d specify the thickness around the disk to create a boost
@@ -125,7 +125,7 @@ class ISF(TorusDEC):
         normal = normal/norm(normal,2)
         alpha = zeros(size(rx))
         z = rx*normal(1) + ry*normal(2) + rz*normal(3)
-        inCylinder = rx.^2+ry.^2+rz.^2 - z.^2 < r^2
+        inCylinder = rx**2+ry**2+rz**2 - z**2 < r^2
         inLayerP = z> 0 & z<= d/2 & inCylinder
         inLayerM = z<=0 & z>=-d/2 & inCylinder
         alpha(inLayerP) = -pi*(2*z(inLayerP)/d - 1)
@@ -135,7 +135,7 @@ class ISF(TorusDEC):
 
 
     @staticmethod
-    def [psi1,psi2] = GaugeTransform(psi1,psi2,q)
+    def [psi1,psi2] = GaugeTransform(psi1,psi2,q) :
         # multiplies exp(i*q) to (psi1,psi2)
         #
         eiq = exp(1i*q)
@@ -145,7 +145,7 @@ class ISF(TorusDEC):
     
     
     @staticmethod
-    def [sx,sy,sz] = Hopf(psi1,psi2)
+    def [sx,sy,sz] = Hopf(psi1,psi2) :
         # extracts Clebsch variable s=(sx,sy,sz) from (psi1,psi2)
         #
         a = real(psi1)
@@ -154,15 +154,15 @@ class ISF(TorusDEC):
         d = imag(psi2)
         sx = 2*(a.*c + b.*d)
         sy = 2*(a.*d - b.*c)
-        sz = a.^2 + b.^2 - c.^2 - d.^2
+        sz = a**2 + b**2 - c**2 - d**2
         return
     
     
     @staticmethod
-    def [psi1,psi2] = Normalize(psi1,psi2)
+    def [psi1,psi2] = Normalize(psi1,psi2) :
         # normalizes (psi1,psi2).
         #
-        psi_norm = sqrt(abs(psi1).^2 + abs(psi2).^2)
+        psi_norm = sqrt(abs(psi1)**2 + abs(psi2)**2)
         psi1 = psi1./psi_norm
         psi2 = psi2./psi_norm
         return
