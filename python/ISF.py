@@ -43,3 +43,107 @@ class ISF(TorusDEC):
         self.hbar = hbar             # reduced Planck constant
         self.dt   = dt             # time step
         self.SchroedingerMask = SchroedingerMask# Fourier coefficient for solving Schroedinger eq
+        
+        
+    def BuildSchroedinger(self) :
+        # builds coefficients in Fourier space.
+        #
+        nx=self.resx; ny=self.resy; nz=self.resz
+        fac = -4*pi^2*self.hbar
+        kx = (self.iix-1-nx/2)/(self.sizex)
+        ky = (self.iiy-1-ny/2)/(self.sizey)
+        kz = (self.iiz-1-nz/2)/(self.sizez)
+        lambda = fac*(kx.^2+ky.^2+kz.^2)
+        self.SchroedingerMask = exp(1i*lambda*self.dt/2)
+        return
+        
+    def [psi1,psi2] = SchroedingerFlow(self,psi1,psi2)
+        # solves Schroedinger equation for dt time.
+        #
+        psi1 = fftshift(fftn(psi1)) psi2 = fftshift(fftn(psi2))
+        psi1 = psi1.*self.SchroedingerMask
+        psi2 = psi2.*self.SchroedingerMask
+        psi1 = ifftn(fftshift(psi1)) psi2 = ifftn(fftshift(psi2))
+        return
+        
+    def [psi1,psi2] = PressureProject(self,psi1,psi2)
+        # Pressure projection of 2-component wave def.
+        #
+        [vx,vy,vz] = self.VelocityOneForm(psi1,psi2)
+        div = self.Div(vx,vy,vz)
+        q = self.PoissonSolve(div)
+        [psi1,psi2] = self.GaugeTransform(psi1,psi2,-q)
+        return
+        
+    def [vx,vy,vz] = VelocityOneForm(self,psi1,psi2,hbar)
+        # extracts velocity 1-form from (psi1,psi2).
+        # If hbar argument is empty, hbar=1 is assumed.
+        ixp = mod(self.ix,self.resx) + 1
+        iyp = mod(self.iy,self.resy) + 1
+        izp = mod(self.iz,self.resz) + 1
+        vx = angle(conj(psi1).*psi1(ixp,:,:) ...
+                  +conj(psi2).*psi2(ixp,:,:))
+        vy = angle(conj(psi1).*psi1(:,iyp,:) ...
+                  +conj(psi2).*psi2(:,iyp,:))
+        vz = angle(conj(psi1).*psi1(:,:,izp) ...
+                  +conj(psi2).*psi2(:,:,izp))
+        if nargin<4
+            hbar = 1
+        return
+        vx = vx*hbar
+        vy = vy*hbar
+        vz = vz*hbar
+        return
+    
+    def psi = AddCircle(self,psi,center,normal,r,d)
+        # adds a vortex ring to a 1-component wave def psi.
+        # Inputs center, normal, r specify the circle.
+        # Input d specify the thickness around the disk to create a boost
+        # in phase. Usually d = 5*dx where dx is grid edge length.
+        rx = self.px - center(1)
+        ry = self.py - center(2)
+        rz = self.pz - center(3)
+        normal = normal/norm(normal,2)
+        alpha = zeros(size(rx))
+        z = rx*normal(1) + ry*normal(2) + rz*normal(3)
+        inCylinder = rx.^2+ry.^2+rz.^2 - z.^2 < r^2
+        inLayerP = z> 0 & z<= d/2 & inCylinder
+        inLayerM = z<=0 & z>=-d/2 & inCylinder
+        alpha(inLayerP) = -pi*(2*z(inLayerP)/d - 1)
+        alpha(inLayerM) = -pi*(2*z(inLayerM)/d + 1)
+        psi = psi.*exp(1i*alpha)
+        return
+
+
+    @staticmethod
+    def [psi1,psi2] = GaugeTransform(psi1,psi2,q)
+        # multiplies exp(i*q) to (psi1,psi2)
+        #
+        eiq = exp(1i*q)
+        psi1 = psi1.*eiq
+        psi2 = psi2.*eiq
+        return
+    
+    
+    @staticmethod
+    def [sx,sy,sz] = Hopf(psi1,psi2)
+        # extracts Clebsch variable s=(sx,sy,sz) from (psi1,psi2)
+        #
+        a = real(psi1)
+        b = imag(psi1)
+        c = real(psi2)
+        d = imag(psi2)
+        sx = 2*(a.*c + b.*d)
+        sy = 2*(a.*d - b.*c)
+        sz = a.^2 + b.^2 - c.^2 - d.^2
+        return
+    
+    
+    @staticmethod
+    def [psi1,psi2] = Normalize(psi1,psi2)
+        # normalizes (psi1,psi2).
+        #
+        psi_norm = sqrt(abs(psi1).^2 + abs(psi2).^2)
+        psi1 = psi1./psi_norm
+        psi2 = psi2./psi_norm
+        return
