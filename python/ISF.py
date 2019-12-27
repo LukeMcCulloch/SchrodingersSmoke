@@ -16,7 +16,7 @@ ifftn = np.fft.ifftn
 
 sin = np.sin
 pi = np.pi
-imag = np.complex(0.,1.)
+imag = np.complex(0.,1.) #or just use, e.g. '1j' to matlab's '1i'
 
 from TorusDEC import TorusDEC
 
