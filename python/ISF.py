@@ -67,10 +67,10 @@ class ISF(TorusDEC):
         # builds coefficients in Fourier space.
         #
         nx=self.resx; ny=self.resy; nz=self.resz
-        fac = -4*pi^2*self.hbar
-        kx = (self.iix-1-nx/2)/(self.sizex)
-        ky = (self.iiy-1-ny/2)/(self.sizey)
-        kz = (self.iiz-1-nz/2)/(self.sizez)
+        fac = -4*pi**2*self.hbar
+        kx = (self.iix-1.-nx/2.)/(self.sizex)
+        ky = (self.iiy-1.-ny/2.)/(self.sizey)
+        kz = (self.iiz-1.-nz/2.)/(self.sizez)
         #lambda = fac*(kx**2+ky**2+kz**2)
         avar = fac*(kx**2+ky**2+kz**2)
         
@@ -121,17 +121,18 @@ class ISF(TorusDEC):
         # Inputs center, normal, r specify the circle.
         # Input d specify the thickness around the disk to create a boost
         # in phase. Usually d = 5*dx where dx is grid edge length.
-        rx = self.px - center(1)
-        ry = self.py - center(2)
-        rz = self.pz - center(3)
-        normal = normal/norm(normal,2)
-        alpha = zeros(size(rx))
-        z = rx*normal(1) + ry*normal(2) + rz*normal(3)
-        inCylinder = rx**2+ry**2+rz**2 - z**2 < r^2
+        rx = self.px - center[0]
+        ry = self.py - center[1]
+        rz = self.pz - center[2]
+        #normal = normal/norm(normal,2) #matlab calls for the 2 norm
+        normal = normal/np.linalg.norm(normal) #linalg gives the 2-norm by default
+        alpha = np.zeros(size(rx))
+        z = rx*normal[0] + ry*normal[1] + rz*normal[2]
+        inCylinder = (rx**2+ry**2+rz**2 - z**2) < r**2
         inLayerP = z> 0 & z<= d/2 & inCylinder
         inLayerM = z<=0 & z>=-d/2 & inCylinder
-        alpha(inLayerP) = -pi*(2*z(inLayerP)/d - 1)
-        alpha(inLayerM) = -pi*(2*z(inLayerM)/d + 1)
+        alpha[inLayerP] = -pi*(2*z(inLayerP)/d - 1)
+        alpha[inLayerM] = -pi*(2*z(inLayerM)/d + 1)
         psi = psi.multiply( exp(1i*alpha) )
         return psi
 
