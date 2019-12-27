@@ -1,6 +1,14 @@
 
+"""
+Created on Dec... 25? 2019
+
+@author: lukemcculloch, based on teh Caltech-TU Berlin Code
+1st author Albert Chern.
+"""
+from __future__ import division
 
 import numpy as np
+from numpy import exp
 fft = np.fft.fft
 ifft = np.fft.ifft
 fftn = np.fft.fftn
@@ -8,6 +16,7 @@ ifftn = np.fft.ifftn
 
 sin = np.sin
 pi = np.pi
+imag = np.complex(0.,1.)
 
 from TorusDEC import TorusDEC
 
@@ -62,10 +71,9 @@ class ISF(TorusDEC):
         ky = (self.iiy-1-ny/2)/(self.sizey)
         kz = (self.iiz-1-nz/2)/(self.sizez)
         #lambda = fac*(kx.^2+ky.^2+kz.^2)
-        def myfunc():
-            return fac*(kx**2+ky**2+kz**2)
+        avar = fac*(kx**2+ky**2+kz**2)
         
-        self.SchroedingerMask = exp(1i*lambda()*self.dt/2)
+        self.SchroedingerMask = exp(1.j*avar*self.dt/2.)
         return
         
     def [psi1,psi2] = SchroedingerFlow(self,psi1,psi2)
