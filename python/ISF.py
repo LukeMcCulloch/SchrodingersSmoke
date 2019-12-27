@@ -13,6 +13,7 @@ fft = np.fft.fft
 ifft = np.fft.ifft
 fftn = np.fft.fftn
 ifftn = np.fft.ifftn
+fftshift = bp.fft.fftshift
 
 sin = np.sin
 pi = np.pi
@@ -79,42 +80,43 @@ class ISF(TorusDEC):
     def SchroedingerFlow(self,psi1,psi2) :
         # solves Schroedinger equation for dt time.
         #
-        psi1 = fftshift(fftn(psi1)) psi2 = fftshift(fftn(psi2))
-        psi1 = psi1.*self.SchroedingerMask
-        psi2 = psi2.*self.SchroedingerMask
-        psi1 = ifftn(fftshift(psi1)) psi2 = ifftn(fftshift(psi2))
+        psi1 = fftshift(fftn(psi1)); psi2 = fftshift(fftn(psi2))
+        psi1 = psi1.multiply( self.SchroedingerMask )
+        psi2 = psi2.multiply( self.SchroedingerMask )
+        psi1 = ifftn(fftshift(psi1)); psi2 = ifftn(fftshift(psi2))
         return np.asarray([psi1,psi2])
         
-    def [psi1,psi2] = PressureProject(self,psi1,psi2) :
+    def PressureProject(self, psi1,psi2) :
         # Pressure projection of 2-component wave def.
         #
         [vx,vy,vz] = self.VelocityOneForm(psi1,psi2)
         div = self.Div(vx,vy,vz)
         q = self.PoissonSolve(div)
-        [psi1,psi2] = self.GaugeTransform(psi1,psi2,-q)
-        return
+        #[psi1,psi2] = self.GaugeTransform(psi1,psi2,-q)
+        #return np.asarray([psi1,psi2])
+        return self.GaugeTransform(psi1,psi2,-q)
         
-    def [vx,vy,vz] = VelocityOneForm(self,psi1,psi2,hbar) :
+    def VelocityOneForm(self, psi1,psi2,hbar) :
         # extracts velocity 1-form from (psi1,psi2).
         # If hbar argument is empty, hbar=1 is assumed.
-        ixp = mod(self.ix,self.resx) + 1
-        iyp = mod(self.iy,self.resy) + 1
-        izp = mod(self.iz,self.resz) + 1
-        vx = angle(conj(psi1).*psi1(ixp,:,:) ...
-                  +conj(psi2).*psi2(ixp,:,:))
-        vy = angle(conj(psi1).*psi1(:,iyp,:) ...
-                  +conj(psi2).*psi2(:,iyp,:))
-        vz = angle(conj(psi1).*psi1(:,:,izp) ...
-                  +conj(psi2).*psi2(:,:,izp))
-        if nargin<4
+        ixp = mod(self.ix,self.resx) + 1.
+        iyp = mod(self.iy,self.resy) + 1.
+        izp = mod(self.iz,self.resz) + 1.
+        vx = angle(conj(psi1).multiply( psi1[ixp,:,:]  )
+                  +conj(psi2).multiply( psi2[ixp,:,:]) )
+        vy = angle(conj(psi1).multiply( psi1[:,iyp,:]  )
+                  +conj(psi2).multiply( psi2[:,iyp,:]) )
+        vz = angle(conj(psi1).multiply( psi1[:,:,izp]  )
+                  +conj(psi2).multiply( psi2[:,:,izp]) )
+        if nargin<4:
             hbar = 1
-        return
+            
         vx = vx*hbar
         vy = vy*hbar
         vz = vz*hbar
-        return
+        return np.asarray([vx,vy,vz])
     
-    def psi = AddCircle(self,psi,center,normal,r,d) :
+    def AddCircle(self, psi,center,normal,r,d) :
         # adds a vortex ring to a 1-component wave def psi.
         # Inputs center, normal, r specify the circle.
         # Input d specify the thickness around the disk to create a boost
@@ -130,18 +132,18 @@ class ISF(TorusDEC):
         inLayerM = z<=0 & z>=-d/2 & inCylinder
         alpha(inLayerP) = -pi*(2*z(inLayerP)/d - 1)
         alpha(inLayerM) = -pi*(2*z(inLayerM)/d + 1)
-        psi = psi.*exp(1i*alpha)
-        return
+        psi = psi.multiply( exp(1i*alpha) )
+        return psi
 
 
     @staticmethod
-    def [psi1,psi2] = GaugeTransform(psi1,psi2,q) :
+    def GaugeTransform(psi1,psi2,q) :
         # multiplies exp(i*q) to (psi1,psi2)
         #
         eiq = exp(1i*q)
-        psi1 = psi1.*eiq
-        psi2 = psi2.*eiq
-        return
+        psi1 = psi1.multiply( eiq )
+        psi2 = psi2.multiply( eiq )
+        return np.asarray([psi1,psi2])
     
     
     @staticmethod
@@ -152,8 +154,8 @@ class ISF(TorusDEC):
         b = imag(psi1)
         c = real(psi2)
         d = imag(psi2)
-        sx = 2*(a.*c + b.*d)
-        sy = 2*(a.*d - b.*c)
+        sx = 2*( a.multiply( c ) + b.multiply( d ) )
+        sy = 2*( a.multiply( d ) - b.multiply( c ) )
         sz = a**2 + b**2 - c**2 - d**2
         return
     

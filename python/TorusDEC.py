@@ -123,15 +123,18 @@ class TorusDEC(object):
         """
         for the function f, compute the 1-form df
         
-        f is a 3D array representing a scalar function on the grid.
-        
-        vx,vy,vz is the 1-form df integrated along edges. 
-        
-        vx corresonds to edge (i,j,k)->(i+1,j,k) and so on.
+            f is a 3D array representing a scalar function on the grid.
+            
+            vx,vy,vz is the 1-form df integrated along edges. 
+            
+            vx corresonds to edge (i,j,k)->(i+1,j,k) and so on.
         """
-    	ixp = mod(self.ix+1,self.resx)
-    	iyp = mod(self.iy+1,self.resy)
-    	izp = mod(self.iz+1,self.resz)
+        ixp = mod(self.ix,self.resx) + 1.
+        iyp = mod(self.iy,self.resy) + 1.
+        izp = mod(self.iz,self.resz) + 1.
+    	#ixp = mod(self.ix+1,self.resx)
+    	#iyp = mod(self.iy+1,self.resy)
+    	#izp = mod(self.iz+1,self.resz)
         vx = f[ixp,:,:] - f
         vy = f[:,iyp,:] - f
         vz = f[:,:,izp] - f
@@ -148,9 +151,12 @@ class TorusDEC(object):
         
         vx corresonds to edge (i,j,k)->(i+1,j,k) and so on.
         """
-        ixp = mod(self.ix+1,self.resx)
-        iyp = mod(self.iy+1,self.resy)
-        izp = mod(self.iz+1,self.resz)
+        ixp = mod(self.ix,self.resx) + 1.
+        iyp = mod(self.iy,self.resy) + 1.
+        izp = mod(self.iz,self.resz) + 1.
+        #ixp = mod(self.ix+1,self.resx)
+        #iyp = mod(self.iy+1,self.resy)
+        #izp = mod(self.iz+1,self.resz)
         wx = vy - vy[:,:,izp] + vz[:,iyp,:] - vz
         wy = vz - vz[ixp,:,:] + vx[:,:,izp] - vx
         wz = vx - vx[:,iyp,:] + vy[ixp,:,:] - vy
@@ -162,9 +168,12 @@ class TorusDEC(object):
         #DerivativeOfTwoForm
         #For a 2-form w compute the 3-form dw
         """
-        ixp = mod(self.ix + 1,self.resx)
-        iyp = mod(self.iy + 1,self.resy)
-        izp = mod(self.iz + 1,self.resz)
+        ixp = mod(self.ix,self.resx) + 1.
+        iyp = mod(self.iy,self.resy) + 1.
+        izp = mod(self.iz,self.resz) + 1.
+        #ixp = mod(self.ix + 1,self.resx)
+        #iyp = mod(self.iy + 1,self.resy)
+        #izp = mod(self.iz + 1,self.resz)
         f =     wx[ixp,:,:] - wx
         f = f + wy[:,iyp,:] - wy
         f = f + wz[:,:,izp] - wz
@@ -175,9 +184,12 @@ class TorusDEC(object):
         #Div
         #For a 1-form v compute the def *d*v
         """
-        ixm = mod(self.ix-2 + 1,self.resx)
-        iym = mod(self.iy-2 + 1,self.resy)
-        izm = mod(self.iz-2 + 1,self.resz)
+        ixm = mod(self.ix-2.,self.resx) + 1.
+        iym = mod(self.iy-2.,self.resy) + 1.
+        izm = mod(self.iz-2.,self.resz) + 1.
+        #ixm = mod(self.ix-2 + 1,self.resx)
+        #iym = mod(self.iy-2 + 1,self.resy)
+        #izm = mod(self.iz-2 + 1,self.resz)
         f =     [vx - vx[ixm,:,:]]/(self.dx**2)
         f = f + [vy - vy[:,iym,:]]/(self.dy**2)
         f = f + [vz - vz[:,:,izm]]/(self.dz**2)
@@ -189,9 +201,12 @@ class TorusDEC(object):
         #For a 1-form v compute the corresponding vector field v^sharp by
         #averaging to vertices
         """
-        ixm = mod(self.ix-2 + 1,self.resx)
-        iym = mod(self.iy-2 + 1,self.resy)
-        izm = mod(self.iz-2 + 1,self.resz)
+        ixm = mod(self.ix-2.,self.resx) + 1.
+        iym = mod(self.iy-2.,self.resy) + 1.
+        izm = mod(self.iz-2.,self.resz) + 1.
+        #ixm = mod(self.ix-2 + 1,self.resx)
+        #iym = mod(self.iy-2 + 1,self.resy)
+        #izm = mod(self.iz-2 + 1,self.resz)
         ux = 0.5*( vx[ixm,:,:] + vx )/self.dx
         uy = 0.5*( vy[:,iym,:] + vy )/self.dy
         uz = 0.5*( vz[:,:,izm] + vz )/self.dz
