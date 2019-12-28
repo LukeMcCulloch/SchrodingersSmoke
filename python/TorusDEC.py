@@ -138,6 +138,7 @@ class TorusDEC(object):
         self.py = (self.iiy)*self.dy
         self.pz = (self.iiz)*self.dz
         
+    
     def DerivativeOfFunction(self, f):
         """
         for the function f, compute the 1-form df
