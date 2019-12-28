@@ -59,7 +59,7 @@ class ISF(TorusDEC):
                  resx=None, resy=None, resz=None, res=None,
                  hbar=None, dt=None, 
                  SchroedingerMask=None):
-        super().__init__(sizex, sizey, sizez,
+        super(TorusDEC, self).__init__(sizex, sizey, sizez,
                          resx, resy, resz, res)
         self.hbar = hbar             # reduced Planck constant
         self.dt   = dt             # time step
