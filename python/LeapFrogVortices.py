@@ -28,7 +28,7 @@ imag = np.complex(0.,1.) #or just use, e.g. '1j' to matlab's '1i'
 import matplotlib.pyplot as plt
 
 from ISF import ISF
-
+from Particles import Particles
 
 
 

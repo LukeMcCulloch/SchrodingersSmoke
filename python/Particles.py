@@ -5,6 +5,7 @@ Created on Fri Dec 27 23:53:24 2019
 
 @author: lukemcculloch
 """
+from __future__ import division
 
 class Particles(object):
     
