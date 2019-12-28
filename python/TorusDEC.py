@@ -17,21 +17,7 @@ ifftn = np.fft.ifftn
 sin = np.sin
 pi = np.pi
 
-from utils import mod
-
-def ndgrid(a,b,c):
-    """
-    matlab's ndgrid is similar but not quite the same as 
-    numpy meshgrid
-    
-    code experimentations shows the
-    need to transpose 0 and 1 dimensions
-    
-    see also:
-    https://stackoverflow.com/questions/12402045/
-    mesh-grid-functions-in-python-meshgrid-mgrid-ogrid-ndgrid
-    """
-    return np.meshgrid(b,a,c)
+from utils import mod, ndgrid
 
 class TorusDEC(object):
     """

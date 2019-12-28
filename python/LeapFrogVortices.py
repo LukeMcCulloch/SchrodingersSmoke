@@ -20,6 +20,7 @@ fftshift = np.fft.fftshift
 rand = np.random.rand
 ones = np.ones
 size = np.shape
+ceil = np.ceil
 
 sin = np.sin
 pi = np.pi
@@ -84,7 +85,7 @@ self = isf
 
 isf.hbar = hbar
 isf.dt = dt
-isf.BuildSchroedinger
+isf.BuildSchroedinger()
 # Set background velocity
 kvec = background_vel/isf.hbar
 phase = kvec[0]*isf.px + kvec[1]*isf.py + kvec[2]*isf.pz
@@ -111,10 +112,9 @@ vv = rand(n_particles,1)
 party = 0.5 + 4*uu
 partz = 0.5 + 4*vv
 partx = 5*ones(size(party))
-particle = Particles
-particle.x = partx
-particle.y = party
-particle.z = partz
+particle = Particles(x=partx,
+                     y=party,
+                     z=partz)
 
 """
 hpart = plot3(particle.x,particle.y,particle.z,'.','MarkerSize',1)
@@ -122,10 +122,15 @@ axis equal
 axis([0,vol_size{1},0,vol_size{2},0,vol_size{3}])
 cameratoolbar
 drawnow
+#"""
 
+"""
 ## MAIN ITERATION
-itermax = ceil(tmax/dt)
-for iter = 1:itermax
+itermax = int(ceil(tmax/dt))
+#for iter = 1:itermax
+iter = 0
+while(iter < itermax):
+    iter +=1
     t = iter*dt
     # incompressible Schroedinger flow
     [psi1,psi2] = isf.SchroedingerFlow(psi1,psi2)
@@ -142,5 +147,5 @@ for iter = 1:itermax
     set(hpart,'XData',particle.x,'YData',particle.y,'ZData',particle.z)
     title(['iter = ',num2str(iter)])
     drawnow
-end
+
 #"""

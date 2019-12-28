@@ -58,7 +58,7 @@ hpart = plot3(particle.x,particle.y,particle.z,'.','MarkerSize',1);
 axis equal;
 axis([0,vol_size{1},0,vol_size{2},0,vol_size{3}]);
 cameratoolbar
-drawnow
+%drawnow
 
 %% MAIN ITERATION
 itermax = ceil(tmax/dt);
