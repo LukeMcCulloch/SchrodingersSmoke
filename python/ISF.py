@@ -15,6 +15,8 @@ fftn = np.fft.fftn
 ifftn = np.fft.ifftn
 fftshift = np.fft.fftshift
 
+conj = np.conj
+
 sin = np.sin
 pi = np.pi
 imag = np.complex(0.,1.) #or just use, e.g. '1j' to matlab's '1i'
@@ -61,6 +63,8 @@ class ISF(TorusDEC):
                  SchroedingerMask=None):
         super(ISF, self).__init__(sizex, sizey, sizez,
                          resx, resy, resz, res)
+        if hbar is None:
+            hbar = 1.
         self.hbar = hbar             # reduced Planck constant
         self.dt   = dt             # time step
         self.SchroedingerMask = SchroedingerMask# Fourier coefficient for solving Schroedinger eq
@@ -99,20 +103,20 @@ class ISF(TorusDEC):
         #return np.asarray([psi1,psi2])
         return self.GaugeTransform(psi1,psi2,-q)
         
-    def VelocityOneForm(self, psi1,psi2,hbar) :
+    def VelocityOneForm(self, psi1,psi2,hbar=1.) :
         # extracts velocity 1-form from (psi1,psi2).
         # If hbar argument is empty, hbar=1 is assumed.
-        ixp = mod(self.ix,self.resx) + 1.
-        iyp = mod(self.iy,self.resy) + 1.
-        izp = mod(self.iz,self.resz) + 1.
+        ixp = mod(self.ix,self.resx) #+ 1
+        iyp = mod(self.iy,self.resy) #+ 1
+        izp = mod(self.iz,self.resz) #+ 1
         vx = angle(conj(psi1) * psi1[ixp,:,:]  
                   +conj(psi2) * psi2[ixp,:,:] )
         vy = angle(conj(psi1) * psi1[:,iyp,:]
                   +conj(psi2) * psi2[:,iyp,:] )
         vz = angle(conj(psi1) * psi1[:,:,izp]
                   +conj(psi2) * psi2[:,:,izp] )
-        if nargin<4:
-            hbar = 1
+        #if nargin<4:
+        #    hbar = 1
             
         vx = vx*hbar
         vy = vy*hbar
@@ -134,8 +138,8 @@ class ISF(TorusDEC):
         inCylinder = (rx**2+ry**2+rz**2 - z**2) < r**2
         inLayerP = (z> 0) & (z<= d/2) & inCylinder
         inLayerM = (z<=0) & (z>=-d/2) & inCylinder
-        alpha[inLayerP] = -pi*(2*z(inLayerP)/d - 1.)
-        alpha[inLayerM] = -pi*(2*z(inLayerM)/d + 1.)
+        alpha[inLayerP] = -pi*(2*z[inLayerP]/d - 1.)
+        alpha[inLayerM] = -pi*(2*z[inLayerM]/d + 1.)
         #psi = np.multiply( psi , exp(1j*alpha) )
         psi = psi * exp(1j*alpha)
         return psi

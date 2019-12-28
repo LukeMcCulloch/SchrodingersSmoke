@@ -19,6 +19,20 @@ pi = np.pi
 
 from utils import mod
 
+def ndgrid(a,b,c):
+    """
+    matlab's ndgrid is similar but not quite the same as 
+    numpy meshgrid
+    
+    code experimentations shows the
+    need to transpose 0 and 1 dimensions
+    
+    see also:
+    https://stackoverflow.com/questions/12402045/
+    mesh-grid-functions-in-python-meshgrid-mgrid-ogrid-ndgrid
+    """
+    return np.meshgrid(b,a,c)
+
 class TorusDEC(object):
     """
     TorusDEC a class simple 3D grid with basic exterior calculus operations.
@@ -111,9 +125,14 @@ class TorusDEC(object):
         
         # numpy y coord == matlab z coord
         # numpy z coord == matlab y coord
-        self.iix,self.iiy,self.iiz = np.meshgrid(self.ix,
+        self.iix,self.iiy,self.iiz = ndgrid(self.ix,
+                                               self.iy,
+                                               self.iz)
+        """
+        self.iix,self.iiy,self.iiz = np.mgrid[self.ix,
                                                  self.iy,
-                                                 self.iz)
+                                                 self.iz]
+        """
         
         self.px = (self.iix)*self.dx
         self.py = (self.iiy)*self.dy
@@ -184,9 +203,9 @@ class TorusDEC(object):
         #Div
         #For a 1-form v compute the def *d*v
         """
-        ixm = mod(self.ix-2.,self.resx) + 1.
-        iym = mod(self.iy-2.,self.resy) + 1.
-        izm = mod(self.iz-2.,self.resz) + 1.
+        ixm = mod(self.ix-2,self.resx) #+ 1
+        iym = mod(self.iy-2,self.resy) #+ 1
+        izm = mod(self.iz-2,self.resz) #+ 1
         #ixm = mod(self.ix-2 + 1,self.resx)
         #iym = mod(self.iy-2 + 1,self.resy)
         #izm = mod(self.iz-2 + 1,self.resz)

@@ -17,11 +17,34 @@ fftn = np.fft.fftn
 ifftn = np.fft.ifftn
 fftshift = np.fft.fftshift
 
+rand = np.random.rand
+ones = np.ones
+size = np.shape
+
 sin = np.sin
 pi = np.pi
 imag = np.complex(0.,1.) #or just use, e.g. '1j' to matlab's '1i'
 
+import matplotlib.pyplot as plt
+
 from ISF import ISF
+
+
+
+
+    
+def plot3D(particle, canvas = None, color='black'):
+    """
+    """
+    if canvas is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+    else:
+        ax = canvas
+        
+    ax.plot(particle.x,particle.y,particle.z)
+    return ax
+
 
 # example_leapfrog
 # An example of incompressible Schroedinger flow producing leapfrogging
@@ -34,7 +57,7 @@ vol_res = np.asarray([[128],[64],[64]]) # volume resolution
 hbar = 0.1            # Planck constant
 dt = 1/24             # time step
 tmax = 85             # max time
-background_vel = [-0.2,0,0] # background velocity
+background_vel = np.asarray([-0.2,0,0]) # background velocity
 
 r1 = 1.5              # radius of 1st ring
 r2 = 0.9              # radius of 2nd ring
@@ -57,3 +80,67 @@ isf = ISF(sizex = vol_size[0,0],
           resx  = vol_res[0,0],
           resy  = vol_res[1,0],
           resz  = vol_res[2,0])
+self = isf
+
+isf.hbar = hbar
+isf.dt = dt
+isf.BuildSchroedinger
+# Set background velocity
+kvec = background_vel/isf.hbar
+phase = kvec[0]*isf.px + kvec[1]*isf.py + kvec[2]*isf.pz
+psi1 = exp(1j*phase)
+psi2 = 0.01*exp(1j*phase)
+# Add vortex rings
+d = isf.dx*5 # neighborhood thickness of seifert surface
+psi1 = isf.AddCircle(psi1,cen1,n1,r1,d)
+"""
+self = isf
+psi=psi1
+center=cen1
+normal=n1
+r=r1
+d=d
+"""
+psi1 = isf.AddCircle(psi1,cen2,n2,r2,d)
+[psi1,psi2] = isf.Normalize(psi1,psi2)
+[psi1,psi2] = isf.PressureProject(psi1,psi2)
+
+## SET PARTICLES
+uu = rand(n_particles,1)
+vv = rand(n_particles,1)
+party = 0.5 + 4*uu
+partz = 0.5 + 4*vv
+partx = 5*ones(size(party))
+particle = Particles
+particle.x = partx
+particle.y = party
+particle.z = partz
+
+"""
+hpart = plot3(particle.x,particle.y,particle.z,'.','MarkerSize',1)
+axis equal
+axis([0,vol_size{1},0,vol_size{2},0,vol_size{3}])
+cameratoolbar
+drawnow
+
+## MAIN ITERATION
+itermax = ceil(tmax/dt)
+for iter = 1:itermax
+    t = iter*dt
+    # incompressible Schroedinger flow
+    [psi1,psi2] = isf.SchroedingerFlow(psi1,psi2)
+    [psi1,psi2] = isf.Normalize(psi1,psi2)
+    [psi1,psi2] = isf.PressureProject(psi1,psi2)
+    
+    # particle visualization
+    [vx,vy,vz] = isf.VelocityOneForm(psi1,psi2,isf.hbar)
+    [vx,vy,vz] = isf.StaggeredSharp(vx,vy,vz)
+    particle.StaggeredAdvect(isf,vx,vy,vz,isf.dt)
+    particle.Keep(particle.x>0&particle.x<vol_size{1}&...
+                  particle.y>0&particle.y<vol_size{2}&...
+                  particle.z>0&particle.z<vol_size{3})
+    set(hpart,'XData',particle.x,'YData',particle.y,'ZData',particle.z)
+    title(['iter = ',num2str(iter)])
+    drawnow
+end
+#"""
