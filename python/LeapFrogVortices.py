@@ -89,11 +89,25 @@ isf.BuildSchroedinger()
 # Set background velocity
 kvec = background_vel/isf.hbar
 phase = kvec[0]*isf.px + kvec[1]*isf.py + kvec[2]*isf.pz
+"""
+python:
+    isf.px[0:10,0:10,0].T
+    phase[0:10,0:10,0].T
+    
+    psi1[0:10,0:10,0].T
+    psi2[0:10,0:10,0].T
+    
+matlab:
+    isf.px(1:10,1:10)
+    phase(1:10,1:10)
+    
+    psi1(1:10,1:10)
+    psi2(1:10,1:10)
+"""
 psi1 = exp(1j*phase)
 psi2 = 0.01*exp(1j*phase)
 # Add vortex rings
 d = isf.dx*5 # neighborhood thickness of seifert surface
-psi1 = isf.AddCircle(psi1,cen1,n1,r1,d)
 """
 self = isf
 psi=psi1
@@ -102,6 +116,7 @@ normal=n1
 r=r1
 d=d
 """
+psi1 = isf.AddCircle(psi1,cen1,n1,r1,d)
 psi1 = isf.AddCircle(psi1,cen2,n2,r2,d)
 [psi1,psi2] = isf.Normalize(psi1,psi2)
 [psi1,psi2] = isf.PressureProject(psi1,psi2)
