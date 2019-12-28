@@ -18,8 +18,11 @@ fftshift = np.fft.fftshift
 sin = np.sin
 pi = np.pi
 imag = np.complex(0.,1.) #or just use, e.g. '1j' to matlab's '1i'
+angle = np.angle
 
 from TorusDEC import TorusDEC
+
+from utils import mod
 
 
 
