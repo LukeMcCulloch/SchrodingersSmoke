@@ -117,6 +117,9 @@ class TorusDEC(object):
         self.px = (self.iix)*self.dx
         self.py = (self.iiy)*self.dy
         self.pz = (self.iiz)*self.dz
+        
+        #tol check
+        self.tol = 1e-14
     
     """    
     import numpy
@@ -252,6 +255,7 @@ class TorusDEC(object):
         #f = np.multiply(f,fac)
         f = ifftn(f)[0]
         return f
+    
     def PoissonSolve(self,f):
         """
         #PoissonSolve by Spectral method
@@ -266,7 +270,6 @@ class TorusDEC(object):
         locinf = np.where(fac == np.amin(fac))
         fac[locinf[0][0],locinf[1][0],locinf[2][0]] = 0.
         fe = fi * fac
-        #f = np.multiply(f,fac)
         fz = ifftn(fe)
         return fz
         

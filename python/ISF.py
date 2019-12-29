@@ -96,8 +96,10 @@ class ISF(TorusDEC):
     def PressureProject(self, psi1,psi2) :
         # Pressure projection of 2-component wave def.
         #
-        [vx,vy,vz] = self.VelocityOneForm(psi1,psi2)
+        [vx,vy,vz] = self.VelocityOneForm(psi1,psi2,
+                                            hbar = 1.)
         div = self.Div(vx,vy,vz)
+        #div[abs(div) < self.tol] = 0.
         q = self.PoissonSolve(div)
         #[psi1,psi2] = self.GaugeTransform(psi1,psi2,-q)
         #return np.asarray([psi1,psi2])
@@ -129,10 +131,20 @@ class ISF(TorusDEC):
         return np.asarray([vx,vy,vz])
     
     def AddCircle(self, psi,center,normal,r,d) :
+        """
         # adds a vortex ring to a 1-component wave def psi.
         # Inputs center, normal, r specify the circle.
         # Input d specify the thickness around the disk to create a boost
         # in phase. Usually d = 5*dx where dx is grid edge length.
+        
+        ## testing:
+        self = isf
+        psi=psi1
+        center=cen1
+        normal=n1
+        r=r1
+        d=d
+        """
         rx = self.px - center[0]
         ry = self.py - center[1]
         rz = self.pz - center[2]
