@@ -114,9 +114,9 @@ class ISF(TorusDEC):
         ixp = mod(self.ix+1,self.resx) #+ 1
         iyp = mod(self.iy+1,self.resy) #+ 1
         izp = mod(self.iz+1,self.resz) #+ 1
-        vy = angle(conj(psi1) * psi1[ixp,:,:]  
+        vx = angle(conj(psi1) * psi1[ixp,:,:]  
                   +conj(psi2) * psi2[ixp,:,:] )
-        vx = angle(conj(psi1) * psi1[:,iyp,:]
+        vy = angle(conj(psi1) * psi1[:,iyp,:]
                   +conj(psi2) * psi2[:,iyp,:] )
         vz = angle(conj(psi1) * psi1[:,:,izp]
                   +conj(psi2) * psi2[:,:,izp] )

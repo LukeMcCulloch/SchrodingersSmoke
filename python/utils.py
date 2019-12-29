@@ -37,5 +37,30 @@ def ndgrid(a,b,c) :
     see also:
     https://stackoverflow.com/questions/12402045/
     mesh-grid-functions-in-python-meshgrid-mgrid-ogrid-ndgrid
+    
+    a = self.ix
+    b = self.iy
+    c = self.iz
+    
     """
-    return np.meshgrid(b,a,c, indexing='xy')
+    l0 = np.shape(a)[0]
+    l1 = np.shape(b)[0]
+    l2 = np.shape(c)[0]
+    
+    e0 = np.zeros((l0,l1,l2),int)
+    for i in range(l1):
+        for j in range(l2):
+            e0[:,i,j] = a
+            
+    e1 = np.zeros((l0,l1,l2),int)
+    for i in range(l1):
+        for j in range(l2):
+            e1[i,:,j] = b
+            
+    e2 = np.zeros((l0,l1,l2),int)
+    for i in range(l1):
+        for j in range(l2):
+            e2[i,j,:] = c
+    
+    #return np.meshgrid( (a,b,c), indexing='xy')
+    return e0,e1,e2

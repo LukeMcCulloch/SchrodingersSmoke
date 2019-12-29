@@ -109,19 +109,10 @@ class TorusDEC(object):
         self.iy = np.arange(0,self.resy)
         self.iz = np.arange(0,self.resz)
         
-        # numpy y coord == matlab z coord
-        # numpy z coord == matlab y coord
+        
         self.iix,self.iiy,self.iiz = ndgrid(self.ix,
                                             self.iy,
                                             self.iz)
-        #        iix,iiy,iiz = np.atleast_3d(self.ix,
-        #                                    self.iy,
-        #                                    self.iz)
-        """
-        self.iix,self.iiy,self.iiz = np.mgrid[self.ix,
-                                                 self.iy,
-                                                 self.iz]
-        """
         
         self.px = (self.iix)*self.dx
         self.py = (self.iiy)*self.dy
@@ -211,9 +202,9 @@ class TorusDEC(object):
         #ixm = mod(self.ix-2 + 1,self.resx)
         #iym = mod(self.iy-2 + 1,self.resy)
         #izm = mod(self.iz-2 + 1,self.resz)
-        f =     [vx - vx[:,iym,:]]/(self.dx**2)
-        f = f + [vy - vy[ixm,:,:]]/(self.dy**2)
-        f = f + [vz - vz[:,:,izm]]/(self.dz**2)
+        f =     [vx - vx[ixm,:,:]][0]/(self.dx**2)
+        f = f + [vy - vy[:,iym,:]][0]/(self.dy**2)
+        f = f + [vz - vz[:,:,izm]][0]/(self.dz**2)
         return f
         
     def Sharp(self,vx,vy,vz):
@@ -244,7 +235,7 @@ class TorusDEC(object):
         uz = vz/self.dz
         return  np.asarray([ux,uy,uz])
         
-    def PoissonSolve(self,f):
+    def PoissonSolveBAD(self,f):
         """
         #PoissonSolve by Spectral method
         f=div
@@ -261,6 +252,23 @@ class TorusDEC(object):
         #f = np.multiply(f,fac)
         f = ifftn(f)[0]
         return f
+    def PoissonSolve(self,f):
+        """
+        #PoissonSolve by Spectral method
+        f=div
+        """
+        fi = fftn(f)
+        sx = sin(pi*(self.iix)/self.resx)/self.dx
+        sy = sin(pi*(self.iiy)/self.resy)/self.dy
+        sz = sin(pi*(self.iiz)/self.resz)/self.dz
+        denom = sx**2 + sy**2 + sz**2
+        fac = -0.25/denom
+        locinf = np.where(fac == np.amin(fac))
+        fac[locinf[0][0],locinf[1][0],locinf[2][0]] = 0.
+        fe = fi * fac
+        #f = np.multiply(f,fac)
+        fz = ifftn(fe)
+        return fz
         
         
         
