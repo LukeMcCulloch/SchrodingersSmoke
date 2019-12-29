@@ -126,7 +126,7 @@ psi1 = isf.AddCircle(psi1,cen1,n1,r1,d)
 psi1 = isf.AddCircle(psi1,cen2,n2,r2,d)
 [psi1,psi2] = isf.Normalize(psi1,psi2)
 #"""
-"""
+#"""
 [psi1,psi2] = isf.PressureProject(psi1,psi2)
 
 ## SET PARTICLES
