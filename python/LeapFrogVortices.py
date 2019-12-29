@@ -27,6 +27,7 @@ pi = np.pi
 imag = np.complex(0.,1.) #or just use, e.g. '1j' to matlab's '1i'
 
 import matplotlib.pyplot as plt
+from plotTrajectory import *
 
 from ISF import ISF
 from Particles import Particles
@@ -57,7 +58,7 @@ vol_size = np.asarray([10.,5.,5.])   # box size
 vol_res = [128,64,64] # volume resolution
 hbar = 0.1            # Planck constant
 dt = 1/24             # time step
-tmax = 85             # max time
+tmax = 1             # max time
 background_vel = np.asarray([-0.2,0,0]) # background velocity
 
 r1 = 1.5              # radius of 1st ring
@@ -141,14 +142,14 @@ particle = Particles(x=partx,
 
 #"""
 """
-hpart = plot3(particle.x,particle.y,particle.z,'.','MarkerSize',1)
+axis = plot3D(particle.x,particle.y,particle.z,'.','MarkerSize',1)
 axis equal
 axis([0,vol_size{1},0,vol_size{2},0,vol_size{3}])
 cameratoolbar
 drawnow
 #"""
 
-"""
+#"""
 ## MAIN ITERATION
 itermax = int(ceil(tmax/dt))
 #for iter = 1:itermax
@@ -156,20 +157,21 @@ iter = 0
 while(iter < itermax):
     iter +=1
     t = iter*dt
+    print t
     # incompressible Schroedinger flow
     [psi1,psi2] = isf.SchroedingerFlow(psi1,psi2)
     [psi1,psi2] = isf.Normalize(psi1,psi2)
     [psi1,psi2] = isf.PressureProject(psi1,psi2)
     
     # particle visualization
-    [vx,vy,vz] = isf.VelocityOneForm(psi1,psi2,isf.hbar)
-    [vx,vy,vz] = isf.StaggeredSharp(vx,vy,vz)
-    particle.StaggeredAdvect(isf,vx,vy,vz,isf.dt)
-    particle.Keep(particle.x>0&particle.x<vol_size{1}&...
-                  particle.y>0&particle.y<vol_size{2}&...
-                  particle.z>0&particle.z<vol_size{3})
-    set(hpart,'XData',particle.x,'YData',particle.y,'ZData',particle.z)
-    title(['iter = ',num2str(iter)])
-    drawnow
+#    [vx,vy,vz] = isf.VelocityOneForm(psi1,psi2,isf.hbar)
+#    [vx,vy,vz] = isf.StaggeredSharp(vx,vy,vz)
+#    particle.StaggeredAdvect(isf,vx,vy,vz,isf.dt)
+#    particle.Keep(particle.x>0&particle.x<vol_size{1}&...
+#                  particle.y>0&particle.y<vol_size{2}&...
+#                  particle.z>0&particle.z<vol_size{3})
+#    set(hpart,'XData',particle.x,'YData',particle.y,'ZData',particle.z)
+#    title(['iter = ',num2str(iter)])
+#    drawnow
 
 #"""

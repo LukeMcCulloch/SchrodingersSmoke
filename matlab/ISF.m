@@ -76,7 +76,7 @@ classdef ISF < TorusDEC
         function [psi1,psi2] = PressureProject(obj,psi1,psi2)
         % Pressure projection of 2-component wave function.
         %
-            [vx,vy,vz] = obj.VelocityOneForm(psi1,psi2);
+            [vx,vy,vz] = obj.VelocityOneForm(psi1,psi2,obj.hbar);
             div = obj.Div(vx,vy,vz);
             q = obj.PoissonSolve(div);
             [psi1,psi2] = obj.GaugeTransform(psi1,psi2,-q);

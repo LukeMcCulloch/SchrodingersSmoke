@@ -96,8 +96,8 @@ class ISF(TorusDEC):
     def PressureProject(self, psi1,psi2) :
         # Pressure projection of 2-component wave def.
         #
-        [vx,vy,vz] = self.VelocityOneForm(psi1,psi2,
-                                            hbar = 1.)
+        [vx,vy,vz] = self.VelocityOneForm(psi1,psi2)#,
+                                            #hbar = 1.)
         div = self.Div(vx,vy,vz)
         #div[abs(div) < self.tol] = 0.
         q = self.PoissonSolve(div)
