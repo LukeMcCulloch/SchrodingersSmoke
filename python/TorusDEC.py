@@ -112,8 +112,11 @@ class TorusDEC(object):
         # numpy y coord == matlab z coord
         # numpy z coord == matlab y coord
         self.iix,self.iiy,self.iiz = ndgrid(self.ix,
-                                               self.iy,
-                                               self.iz)
+                                            self.iy,
+                                            self.iz)
+        #        iix,iiy,iiz = np.atleast_3d(self.ix,
+        #                                    self.iy,
+        #                                    self.iz)
         """
         self.iix,self.iiy,self.iiz = np.mgrid[self.ix,
                                                  self.iy,
@@ -123,8 +126,20 @@ class TorusDEC(object):
         self.px = (self.iix)*self.dx
         self.py = (self.iiy)*self.dy
         self.pz = (self.iiz)*self.dz
-        
     
+    """    
+    import numpy
+    x = numpy.array([1, 2, 3])
+    y = numpy.array([10, 20, 30]) 
+    XX, YY = numpy.meshgrid(x, y)
+    ZZ = XX + YY
+    
+    YY, XX = numpy.mgrid[10:40:10, 1:4]
+    ZZ = XX + YY # These are equivalent to the output of meshgrid
+
+    YY, XX = numpy.ogrid[10:40:10, 1:4]
+    ZZ = XX + YY # These are equivalent to the atleast_2d example
+    #"""
     def DerivativeOfFunction(self, f):
         """
         for the function f, compute the 1-form df
@@ -190,14 +205,14 @@ class TorusDEC(object):
         #Div
         #For a 1-form v compute the def *d*v
         """
-        ixm = mod(self.ix-2,self.resx) #+ 1
-        iym = mod(self.iy-2,self.resy) #+ 1
-        izm = mod(self.iz-2,self.resz) #+ 1
+        ixm = mod(self.ix-2+1,self.resx) #+ 1
+        iym = mod(self.iy-2+1,self.resy) #+ 1
+        izm = mod(self.iz-2+1,self.resz) #+ 1
         #ixm = mod(self.ix-2 + 1,self.resx)
         #iym = mod(self.iy-2 + 1,self.resy)
         #izm = mod(self.iz-2 + 1,self.resz)
-        f =     [vx - vx[ixm,:,:]]/(self.dx**2)
-        f = f + [vy - vy[:,iym,:]]/(self.dy**2)
+        f =     [vx - vx[:,iym,:]]/(self.dx**2)
+        f = f + [vy - vy[ixm,:,:]]/(self.dy**2)
         f = f + [vz - vz[:,:,izm]]/(self.dz**2)
         return f
         
@@ -232,6 +247,7 @@ class TorusDEC(object):
     def PoissonSolve(self,f):
         """
         #PoissonSolve by Spectral method
+        f=div
         """
         f = fftn(f)
         sx = sin(pi*(self.iix-1)/self.resx)/self.dx
@@ -239,10 +255,11 @@ class TorusDEC(object):
         sz = sin(pi*(self.iiz-1)/self.resz)/self.dz
         denom = sx**2 + sy**2 + sz**2
         fac = -0.25/denom
-        fac[0,0,0] = 0
+        locinf = np.where(fac == np.amin(fac))
+        fac[locinf[0][0],locinf[1][0],locinf[2][0]] = 0.
         f = f * fac
         #f = np.multiply(f,fac)
-        f = ifftn(f)
+        f = ifftn(f)[0]
         return f
         
         

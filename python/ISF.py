@@ -75,9 +75,9 @@ class ISF(TorusDEC):
         #
         nx=self.resx; ny=self.resy; nz=self.resz
         fac = -4*pi**2*self.hbar
-        kx = (self.iix-1.-nx/2.)/(self.sizex)
-        ky = (self.iiy-1.-ny/2.)/(self.sizey)
-        kz = (self.iiz-1.-nz/2.)/(self.sizez)
+        kx = (self.iix-nx/2.)/(self.sizex)
+        ky = (self.iiy-ny/2.)/(self.sizey)
+        kz = (self.iiz-nz/2.)/(self.sizez)
         #lambda = fac*(kx**2+ky**2+kz**2)
         avar = fac*(kx**2+ky**2+kz**2)
         
@@ -103,15 +103,20 @@ class ISF(TorusDEC):
         #return np.asarray([psi1,psi2])
         return self.GaugeTransform(psi1,psi2,-q)
         
-    def VelocityOneForm(self, psi1,psi2,hbar=1.) :
+    def VelocityOneForm(self, psi1,psi2,hbar=None) :
         # extracts velocity 1-form from (psi1,psi2).
         # If hbar argument is empty, hbar=1 is assumed.
-        ixp = mod(self.ix,self.resx) #+ 1
-        iyp = mod(self.iy,self.resy) #+ 1
-        izp = mod(self.iz,self.resz) #+ 1
-        vx = angle(conj(psi1) * psi1[ixp,:,:]  
+        #
+        # note: defined for periodic grid
+        #
+        if hbar is None:
+            hbar = self.hbar
+        ixp = mod(self.ix+1,self.resx) #+ 1
+        iyp = mod(self.iy+1,self.resy) #+ 1
+        izp = mod(self.iz+1,self.resz) #+ 1
+        vy = angle(conj(psi1) * psi1[ixp,:,:]  
                   +conj(psi2) * psi2[ixp,:,:] )
-        vy = angle(conj(psi1) * psi1[:,iyp,:]
+        vx = angle(conj(psi1) * psi1[:,iyp,:]
                   +conj(psi2) * psi2[:,iyp,:] )
         vz = angle(conj(psi1) * psi1[:,:,izp]
                   +conj(psi2) * psi2[:,:,izp] )
@@ -150,9 +155,11 @@ class ISF(TorusDEC):
         # multiplies exp(i*q) to (psi1,psi2)
         #
         eiq = exp(1j*q)
-        psi1 = np.multiply( psi1 , eiq )
-        psi2 = np.multiply( psi2 , eiq )
-        return np.asarray([psi1,psi2])
+        #        psi1 = np.multiply( psi1 , eiq )
+        #        psi2 = np.multiply( psi2 , eiq )
+        psi1 = psi1 * eiq 
+        psi2 = psi2 * eiq 
+        return [psi1,psi2]
     
     
     @staticmethod

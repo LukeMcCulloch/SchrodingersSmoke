@@ -53,8 +53,8 @@ def plot3D(particle, canvas = None, color='black'):
 
 
 ## PARAMETERS
-vol_size = np.asarray([[10.],[5.],[5.]])    # box size
-vol_res = np.asarray([[128],[64],[64]]) # volume resolution
+vol_size = np.asarray([10.,5.,5.])   # box size
+vol_res = [128,64,64] # volume resolution
 hbar = 0.1            # Planck constant
 dt = 1/24             # time step
 tmax = 85             # max time
@@ -75,12 +75,13 @@ n_particles = 10000   # number of particles
 ## INITIALIZATION
 
 
-isf = ISF(sizex = vol_size[0,0],
-          sizey = vol_size[1,0],
-          sizez = vol_size[2,0],
-          resx  = vol_res[0,0],
-          resy  = vol_res[1,0],
-          resz  = vol_res[2,0])
+isf = ISF(sizex = vol_size[0],
+          sizey = vol_size[1],
+          sizez = vol_size[2],
+          resx  = vol_res[0],
+          resy  = vol_res[1],
+          resz  = vol_res[2],
+          hbar = hbar)
 self = isf
 
 isf.hbar = hbar

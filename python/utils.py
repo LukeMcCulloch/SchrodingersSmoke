@@ -38,4 +38,4 @@ def ndgrid(a,b,c) :
     https://stackoverflow.com/questions/12402045/
     mesh-grid-functions-in-python-meshgrid-mgrid-ogrid-ndgrid
     """
-    return np.meshgrid(b,a,c)
+    return np.meshgrid(b,a,c, indexing='xy')
